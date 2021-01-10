@@ -30,13 +30,16 @@ def read_data():
     global counter
     if(run):
         sound = s.read(buff_size)
-        counter += len(sound)
-        temp_arr+=sound
-        if(counter > 1023):
-            arr.append(temp_arr)
-            stream.write(bytes(temp_arr))
-            temp_arr = []
-            counter = 0;
+        arr.append(sound)
+        stream.write(sound)
+        #sound = s.read(buff_size)
+        #counter += len(sound)
+        #temp_arr+=sound
+        #if(counter > 1023):
+            #arr.append(temp_arr)
+            #stream.write(bytes(temp_arr))
+            #temp_arr = []
+            #counter = 0;
         
     else:
         s.read(buff_size)
