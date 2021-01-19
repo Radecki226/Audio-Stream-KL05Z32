@@ -6,6 +6,7 @@ import struct
 from scipy.io import wavfile
 from tkinter import *  
 from tkinter import messagebox
+from tkinter import simpledialog
 from playsound import playsound
 import pyaudio
 
@@ -18,6 +19,7 @@ temp_arr = []
 run = 0
 start_state = 0
 counter = 0
+quit_flag = 0
 s = serial.Serial('COM5' , baudrate = 230400)
 messagebox.showinfo("Hello!" , "Port initialized!")
 
@@ -28,22 +30,19 @@ def read_data():
     global p 
     global stream
     global counter
-    if(run):
-        sound = s.read(buff_size)
-        arr.append(sound)
-        stream.write(sound)
-        #sound = s.read(buff_size)
-        #counter += len(sound)
-        #temp_arr+=sound
-        #if(counter > 1023):
-            #arr.append(temp_arr)
-            #stream.write(bytes(temp_arr))
-            #temp_arr = []
-            #counter = 0;
-        
+    global quit_flag
+    if (quit_flag == 1):
+        return
     else:
-        s.read(buff_size)
-    top.after(10, read_data)
+
+        if(run):
+            sound = s.read(buff_size)
+            arr.append(sound)
+            stream.write(sound)
+        else:
+            s.read(buff_size)
+ 
+        top.after(10, read_data)
 
 def start_reading():
     global run
@@ -65,8 +64,10 @@ def quit_app():
     global arr
     global p
     global stream
+    global quit_flag
     
     s.close()
+    quit_flag = 1
     stream.stop_stream()
     stream.close()
     p.terminate()
@@ -85,10 +86,12 @@ def quit_app():
         arr1 = np.asarray(arr1 , dtype = np.int16)
         plt.plot(arr1)
         plt.show()
-        wavfile.write('sound.wav' , 16000 , arr1)
+        answer = simpledialog.askstring("Input", "Type path to file",
+                                parent=top)
+        if answer is not None:
+            wavfile.write(answer , 16000 , arr1)
         top.destroy()
-        time.sleep(2)
-        playsound('sound.wav')
+       
 
 
 
